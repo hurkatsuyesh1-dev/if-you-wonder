@@ -3,13 +3,16 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { AuthProvider } from "@/context/AuthContext";
 import { SpendProvider } from "@/context/SpendContext";
 import { ThemeProvider } from "@/context/ThemeContext";
+import { ProtectedRoute } from "@/components/ProtectedRoute";
 import { Navigation } from "@/components/Navigation";
 import Index from "./pages/Index";
 import LogSpend from "./pages/LogSpend";
 import Report from "./pages/Report";
 import Settings from "./pages/Settings";
+import Auth from "./pages/Auth";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -17,22 +20,25 @@ const queryClient = new QueryClient();
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <ThemeProvider>
-      <SpendProvider>
-        <TooltipProvider>
-          <Toaster />
-          <Sonner />
-          <BrowserRouter>
-            <Routes>
-              <Route path="/" element={<Index />} />
-              <Route path="/log" element={<LogSpend />} />
-              <Route path="/report" element={<Report />} />
-              <Route path="/settings" element={<Settings />} />
-              <Route path="*" element={<NotFound />} />
-            </Routes>
-            <Navigation />
-          </BrowserRouter>
-        </TooltipProvider>
-      </SpendProvider>
+      <AuthProvider>
+        <SpendProvider>
+          <TooltipProvider>
+            <Toaster />
+            <Sonner />
+            <BrowserRouter>
+              <Routes>
+                <Route path="/auth" element={<Auth />} />
+                <Route path="/" element={<ProtectedRoute><Index /></ProtectedRoute>} />
+                <Route path="/log" element={<ProtectedRoute><LogSpend /></ProtectedRoute>} />
+                <Route path="/report" element={<ProtectedRoute><Report /></ProtectedRoute>} />
+                <Route path="/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
+                <Route path="*" element={<NotFound />} />
+              </Routes>
+              <Navigation />
+            </BrowserRouter>
+          </TooltipProvider>
+        </SpendProvider>
+      </AuthProvider>
     </ThemeProvider>
   </QueryClientProvider>
 );
