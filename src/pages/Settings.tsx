@@ -2,22 +2,27 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTheme } from '@/context/ThemeContext';
 import { useSpends } from '@/context/SpendContext';
+import { useAuth } from '@/context/AuthContext';
 import { InterestRateSlider } from '@/components/InterestRateSlider';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
-import { ArrowLeft, Moon, Sun, Trash2, Heart } from 'lucide-react';
+import { ArrowLeft, Moon, Sun, User, LogOut, Heart } from 'lucide-react';
+import { toast } from 'sonner';
 
 export default function Settings() {
   const navigate = useNavigate();
   const { theme, toggleTheme } = useTheme();
   const { interestRate, setInterestRate, spends } = useSpends();
+  const { user, signOut } = useAuth();
 
-  const handleClearData = () => {
-    if (window.confirm('Are you sure? This will delete all your spending data. This cannot be undone.')) {
-      localStorage.removeItem('regret-calculator-spends');
-      window.location.reload();
+  const handleSignOut = async () => {
+    try {
+      await signOut();
+      toast.success('Signed out successfully');
+    } catch (error) {
+      toast.error('Failed to sign out');
     }
   };
 
@@ -37,8 +42,36 @@ export default function Settings() {
       </header>
 
       <main className="container max-w-lg mx-auto px-4 py-6 space-y-4">
-        {/* Appearance */}
+        {/* Account */}
         <Card className="animate-fade-in">
+          <CardHeader>
+            <CardTitle className="text-base flex items-center gap-2">
+              <User className="w-4 h-4" />
+              Account
+            </CardTitle>
+            <CardDescription>Manage your account</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="flex items-center gap-3 p-3 rounded-lg bg-muted/50">
+              <User className="w-5 h-5 text-muted-foreground" />
+              <div className="flex-1">
+                <p className="text-sm font-medium">{user?.email}</p>
+                <p className="text-xs text-muted-foreground">Logged in</p>
+              </div>
+            </div>
+            <Button 
+              onClick={handleSignOut}
+              variant="outline" 
+              className="w-full"
+            >
+              <LogOut className="w-4 h-4 mr-2" />
+              Sign Out
+            </Button>
+          </CardContent>
+        </Card>
+
+        {/* Appearance */}
+        <Card className="animate-fade-in" style={{ animationDelay: '0.1s' }}>
           <CardHeader>
             <CardTitle className="text-base flex items-center gap-2">
               {theme === 'light' ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
@@ -62,7 +95,7 @@ export default function Settings() {
         </Card>
 
         {/* Investment Settings */}
-        <Card className="animate-fade-in" style={{ animationDelay: '0.1s' }}>
+        <Card className="animate-fade-in" style={{ animationDelay: '0.2s' }}>
           <CardHeader>
             <CardTitle className="text-base">Investment Assumptions</CardTitle>
             <CardDescription>Set your expected annual return rate</CardDescription>
@@ -79,36 +112,24 @@ export default function Settings() {
           </CardContent>
         </Card>
 
-        {/* Data Management */}
-        <Card className="animate-fade-in" style={{ animationDelay: '0.2s' }}>
+        {/* Data Stats */}
+        <Card className="animate-fade-in" style={{ animationDelay: '0.3s' }}>
           <CardHeader>
-            <CardTitle className="text-base flex items-center gap-2">
-              <Trash2 className="w-4 h-4" />
-              Data Management
-            </CardTitle>
-            <CardDescription>Manage your spending data</CardDescription>
+            <CardTitle className="text-base">Your Data</CardTitle>
+            <CardDescription>Overview of your spending history</CardDescription>
           </CardHeader>
-          <CardContent className="space-y-4">
+          <CardContent>
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm font-medium">Total Records</p>
                 <p className="text-xs text-muted-foreground">{spends.length} spends logged</p>
               </div>
             </div>
-            <Button 
-              variant="destructive" 
-              className="w-full"
-              onClick={handleClearData}
-              disabled={spends.length === 0}
-            >
-              <Trash2 className="w-4 h-4 mr-2" />
-              Clear All Data
-            </Button>
           </CardContent>
         </Card>
 
         {/* About */}
-        <Card className="animate-fade-in" style={{ animationDelay: '0.3s' }}>
+        <Card className="animate-fade-in" style={{ animationDelay: '0.4s' }}>
           <CardHeader>
             <CardTitle className="text-base flex items-center gap-2">
               <Heart className="w-4 h-4 text-destructive" />
@@ -123,14 +144,14 @@ export default function Settings() {
                 Building better money habits, one regret at a time.
               </p>
               <p className="text-xs text-muted-foreground">
-                Your data stays on your device. No account needed.
+                Your spending data is securely stored in the cloud.
               </p>
             </div>
           </CardContent>
         </Card>
 
         {/* Fun Footer */}
-        <div className="text-center py-6 animate-fade-in" style={{ animationDelay: '0.4s' }}>
+        <div className="text-center py-6 animate-fade-in" style={{ animationDelay: '0.5s' }}>
           <p className="text-sm text-muted-foreground">
             Made with 💚 for your financial wellbeing
           </p>

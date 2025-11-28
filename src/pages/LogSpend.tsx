@@ -30,16 +30,20 @@ export default function LogSpend() {
   const regretScore = useRegretScore(amount, interestRate, selectedType);
   const alternative = currentSpend ? getRandomAlternative(currentSpend.category) : null;
 
-  const handleFormSubmit = (spendData: Omit<Spend, 'id' | 'createdAt' | 'type'>) => {
-    const spend = addSpend(spendData);
-    setCurrentSpend(spend);
-    setStep('classify');
+  const handleFormSubmit = async (spendData: Omit<Spend, 'id' | 'createdAt' | 'type'>) => {
+    try {
+      const spend = await addSpend(spendData);
+      setCurrentSpend(spend);
+      setStep('classify');
+    } catch (error) {
+      // Error already handled in context
+    }
   };
 
-  const handleTypeSelect = (type: SpendType) => {
+  const handleTypeSelect = async (type: SpendType) => {
     setSelectedType(type);
     if (currentSpend) {
-      updateSpendType(currentSpend.id, type);
+      await updateSpendType(currentSpend.id, type);
     }
     setStep('result');
   };
